@@ -67,7 +67,7 @@ setup(
         'Topic :: System :: Systems Administration :: Authentication/Directory',
 
         'Environment :: Web Environment',
-        'Framework :: Django'
+        'Framework :: Django',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
