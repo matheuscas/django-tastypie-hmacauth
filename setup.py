@@ -33,18 +33,18 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")    
 
 setup(
-    name='tastypie_hmacauth',
+    name='django-tastypie-hmacauth',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
     version=find_version('tastypie_hmacauth','__init__.py'),
 
-    description='A HMAC module/class authentication for Tastypie and Django',
+    description='A HMAC class authentication for Tastypie and Django',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/pypa/sampleproject',
+    url='https://github.com/matheuscas/django-tastypie-hmacauth.git',
 
     # Author details
     author='Matheus Cardoso',
