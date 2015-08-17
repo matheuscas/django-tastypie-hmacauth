@@ -1,0 +1,2 @@
+django-tastypie==0.12.2
+tastypie-hmacauth==0.0.1b1
