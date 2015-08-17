@@ -9,7 +9,7 @@ from tastypie.http import HttpUnauthorized
 from tastypie.compat import get_user_model
 from tastypie.authentication import Authentication
 
-class HMACAuth(Authentication):
+class HMACAuthentication(Authentication):
     """A keyed-hash message authentication for Tastypie and Django"""
     
     def __init__(self, require_active=True, timestamp_window=5):
