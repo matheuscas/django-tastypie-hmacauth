@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/matheuscas/django-tastypie-hmacauth.svg?branch=master
+    :target: https://travis-ci.org/matheuscas/django-tastypie-hmacauth
+
 Django-tastypie-hmacauth
 ------------------------
 
