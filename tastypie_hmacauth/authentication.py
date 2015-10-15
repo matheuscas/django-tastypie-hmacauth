@@ -8,6 +8,7 @@ from django.conf import settings
 from tastypie.http import HttpUnauthorized
 from tastypie.compat import get_user_model
 from tastypie.authentication import Authentication
+import pprint
 
 class HMACAuthentication(Authentication):
     """A keyed-hash message authentication for Tastypie and Django"""
@@ -48,10 +49,23 @@ class HMACAuthentication(Authentication):
 
         return True    
 
-    def is_api_key_valid(self, api_key, request):        
-        url = request.build_absolute_uri() # pega a url inteira
-        url = url.split('api_key')[0] # pega a url antes da api_key
-        url = url[:len(url) - 1] # se livra do & da api_key
+    def is_api_key_valid(self, api_key, request):
+
+        protocol = 'http://'
+        if 'HTTPS' in request.META['SERVER_PROTOCOL']:
+            protocol = 'https://'
+
+        host = request.META['HTTP_HOST']
+        path = request.META['PATH_INFO']
+
+        params = request.GET.copy()
+        query_string = '?'
+        for k,v in params.iteritems():
+            if k != 'api_key':
+                query_string = query_string + k + '=' + v + '&'        
+                
+        url = protocol + host + path + query_string
+        url = url[:len(url) - 1] 
         if request.method == 'POST' or request.method == 'PUT':
             url += request.body
         digest = hmac.new(settings.SECRET_KEY, url, hashlib.sha256).hexdigest()
