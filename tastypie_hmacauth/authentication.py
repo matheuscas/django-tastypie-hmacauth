@@ -8,6 +8,7 @@ from django.conf import settings
 from tastypie.http import HttpUnauthorized
 from tastypie.compat import get_user_model
 from tastypie.authentication import Authentication
+from tastypie.exceptions import ImmediateHttpResponse
 import pprint
 
 class HMACAuthentication(Authentication):
@@ -23,15 +24,15 @@ class HMACAuthentication(Authentication):
     def extract_credentials(self, request):
         public_key = request.GET.get('public_key') or request.POST.get('public_key')
         if public_key is None:
-            raise ValueError('public_key not found')
+            raise ImmediateHttpResponse(response=http.HttpBadRequest('public_key not found'))
         
         api_key = request.GET.get('api_key') or request.POST.get('api_key')
         if api_key is None:
-            raise ValueError('api_key not found')
+            raise ImmediateHttpResponse(response=http.HttpBadRequest('api_key not found'))
 
         timestamp = request.GET.get('timestamp') or request.POST.get('timestamp')
         if timestamp is None:
-            raise ValueError('timestamp not found')
+            raise ImmediateHttpResponse(response=http.HttpBadRequest('timestamp not found'))
 
         return public_key, api_key, timestamp
 
@@ -69,9 +70,9 @@ class HMACAuthentication(Authentication):
         if request.method == 'POST' or request.method == 'PUT':
             url += request.body
         digest = hmac.new(settings.SECRET_KEY, url, hashlib.sha256).hexdigest()
-        if digest == api_key:
-            return True
-        return False
+        if digest != api_key:
+            raise ImmediateHttpResponse(response=http.HttpBadRequest('api_key is not valid'))
+        return True
 
     def get_user(self, public_key):
         
@@ -99,9 +100,9 @@ class HMACAuthentication(Authentication):
             diff = int(d2_ts-d1_ts) / 60
 
             if diff > self.timestamp_window:
-                raise ValueError('Exceeded timestamp window')
+                raise ImmediateHttpResponse(response=http.HttpBadRequest('Exceeded timestamp window'))
         except Exception, e:            
-            raise e
+            raise ImmediateHttpResponse(response=http.HttpBadRequest('Unknown error on timestamp validation'))
 
         return True    
 
