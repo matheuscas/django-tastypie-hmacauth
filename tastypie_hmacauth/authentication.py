@@ -9,7 +9,7 @@ from tastypie.http import HttpUnauthorized
 from tastypie.compat import get_user_model
 from tastypie.authentication import Authentication
 from tastypie.exceptions import ImmediateHttpResponse
-import pprint
+import pprint, operator
 
 class HMACAuthentication(Authentication):
     """A keyed-hash message authentication for Tastypie and Django"""
@@ -60,13 +60,14 @@ class HMACAuthentication(Authentication):
         path = request.META['PATH_INFO']
 
         params = request.GET.copy()
+        params = sorted(params.items(), key=operator.itemgetter(0))
         query_string = '?'
-        for k,v in params.iteritems():
-            if k != 'api_key':
-                query_string = query_string + k + '=' + v + '&'        
+        for t in params:
+            if t[0] != 'api_key':
+                query_string = query_string + t[0] + '=' + t[1] + '&'
                 
         url = protocol + host + path + query_string
-        url = url[:len(url) - 1] 
+        url = url[:len(url) - 1]
         if request.method == 'POST' or request.method == 'PUT':
             url += request.body
         digest = hmac.new(settings.SECRET_KEY, url, hashlib.sha256).hexdigest()
