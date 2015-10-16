@@ -98,6 +98,8 @@ Then, to **HMACAuthentication** fully works with Tastypie and Django and provide
 
 **Sorry for that. In the next releases, it will let you decide what to do.**
 
+**NOTE**: You should be aware of your parameters ordering. This authentication method removes API_KEY from URL and reconstructs it sorting the parameters in ascending order to validate request. Hence, you **MUST** sort your params as well.
+
 How it works
 ------------
 
