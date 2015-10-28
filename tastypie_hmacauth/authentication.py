@@ -69,8 +69,8 @@ class HMACAuthentication(Authentication):
         url = protocol + host + path + query_string
         url = url[:len(url) - 1]
         if request.method == 'POST' or request.method == 'PUT':
-            url += request.body
-        digest = hmac.new(settings.SECRET_KEY, url, hashlib.sha256).hexdigest()
+            url += request.body.decode('utf-8')
+        digest = hmac.new(settings.SECRET_KEY, url.encode('utf-8'), hashlib.sha256).hexdigest()
         if digest != api_key:
             raise ImmediateHttpResponse(response=http.HttpBadRequest('api_key is not valid'))
         return True
