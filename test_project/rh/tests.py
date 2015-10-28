@@ -149,6 +149,12 @@ def test_POST_funcionario():
 	response = post(funcionarios + '?public_key=2&timestamp=' + TIMESTAMP_AGORA, {"nome":"Funcionario", "patrao":"/api/v1/patrao/1/", "usuario":"/api/v1/usuario/2/"})	
 	assert_code(response, 201)
 
+def test_POST_funcionario_UTF8():
+	"""Tem de retornar o codigo 201, informando que o funcionario, COM ACENTO, foi cadastrado"""
+
+	response = post(funcionarios + '?public_key=2&timestamp=' + TIMESTAMP_AGORA, {"nome":"Funcionáriõôè @#$%*()_+", "patrao":"/api/v1/patrao/1/", "usuario":"/api/v1/usuario/2/"})	
+	assert_code(response, 201)	
+
 def test_PUT_funcionario():
 	"""Tem de retornar o codigo 204, pois informará que o funcionario foi atualizado"""
 
