@@ -21,7 +21,7 @@ Installation
 
 .. code-block:: python
 
-   pip install django-tastypie-hmacauth==0.0.1b6
+   pip install django-tastypie-hmacauth==0.0.1b7
 
 And you are done! You just need to import do your *api.py* and you along with your *ModelResources* and make a little modification in *settings.py*. See 'Caveats'. 
 
