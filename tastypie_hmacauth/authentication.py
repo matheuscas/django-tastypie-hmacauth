@@ -56,7 +56,7 @@ class HMACAuthentication(Authentication):
         if 'HTTPS' in request.META['SERVER_PROTOCOL']:
             protocol = 'https://'
 
-        host = request.META['HTTP_HOST']
+        host = request.META['HTTP_HOST'] if 'HTTP_HOST' in request.META else 'localhost' #ResourceTestCase api_client does not setn HTTP_HOST
         path = request.META['PATH_INFO']
 
         params = request.GET.copy()
