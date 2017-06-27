@@ -22,6 +22,7 @@ usuarios = '/api/v1/usuario/'
 
 QTD_PATROES = 1
 PREFIX = 'http://localhost'
+PREFIX_SSL = 'https://localhost'
 TEST_USERNAME = "novo_usuario_teste"
 TEST_PASSWORD = "novo_usuario_senha"
 
@@ -37,9 +38,9 @@ def setup_module():
     fixture.create(QTD_PATROES)
 
 
-def hmac_hashing(url, payload=None):
-    
-    url_to_hash = PREFIX + url
+def hmac_hashing(url, payload=None, ssl_on=False):
+
+    url_to_hash = PREFIX + url if not ssl_on else PREFIX_SSL + url
     if payload:
         url_to_hash += json.dumps(payload)
     digest_maker = hmac.new(settings.SECRET_KEY, url_to_hash, hashlib.sha256)
@@ -48,39 +49,63 @@ def hmac_hashing(url, payload=None):
         url = url + "&api_key=" + digest
     else:
         url = url + "?api_key=" + digest
-    return url      
+    return url
 
-def get(url_get, hashing=True):
+def get(url_get, hashing=True, ssl_on=False):
+
+    environ = {}
+    if ssl_on:
+        environ["wsgi.url_scheme"] = "https"
 
     if hashing:
-        url_get = hmac_hashing(url_get)
-    
-    c = Client(app, BaseResponse)
-    return c.get(url_get)
+        url_get = hmac_hashing(url_get, ssl_on=ssl_on)
 
-def post(url_post, payload, hashing=True):
-    if hashing:
-        url_post = hmac_hashing(url_post, payload)
     c = Client(app, BaseResponse)
-    return c.post(url_post, data=json.dumps(payload), headers={'Content-Type':'application/json'})
+    return c.get(url_get, environ_overrides=environ)
 
-def put(url_put, payload, hashing=True):
-    if hashing:
-        url_put = hmac_hashing(url_put, payload)
-    c = Client(app, BaseResponse)
-    return c.put(url_put, data=json.dumps(payload), headers={'Content-Type':'application/json'})
+def post(url_post, payload, hashing=True, ssl_on=False):
 
-def patch(url_patch, payload, hashing=True):
-    if hashing:
-        url_patch = hmac_hashing(url_patch, payload)
-    c = Client(app, BaseResponse)
-    return c.patch(url_patch, data=json.dumps(payload), headers={'Content-Type':'application/json'})
+    environ = {}
+    if ssl_on:
+        environ["wsgi.url_scheme"] = "https"
 
-def delete(url_del, hashing=True):
     if hashing:
-        url_del = hmac_hashing(url_del)
+        url_post = hmac_hashing(url_post, payload, ssl_on=ssl_on)
     c = Client(app, BaseResponse)
-    return c.delete(url_del)
+    return c.post(url_post, data=json.dumps(payload), headers={'Content-Type':'application/json'}, environ_overrides=environ)
+
+def put(url_put, payload, hashing=True, ssl_on=False):
+
+    environ = {}
+    if ssl_on:
+        environ["wsgi.url_scheme"] = "https"
+
+    if hashing:
+        url_put = hmac_hashing(url_put, payload, ssl_on=ssl_on)
+    c = Client(app, BaseResponse)
+    return c.put(url_put, data=json.dumps(payload), headers={'Content-Type':'application/json'}, environ_overrides=environ)
+
+def patch(url_patch, payload, hashing=True, ssl_on=False):
+
+    environ = {}
+    if ssl_on:
+        environ["wsgi.url_scheme"] = "https"
+
+    if hashing:
+        url_patch = hmac_hashing(url_patch, payload, ssl_on=ssl_on)
+    c = Client(app, BaseResponse)
+    return c.patch(url_patch, data=json.dumps(payload), headers={'Content-Type':'application/json'}, environ_overrides=environ)
+
+def delete(url_del, hashing=True, ssl_on=False):
+
+    environ = {}
+    if ssl_on:
+        environ["wsgi.url_scheme"] = "https"
+
+    if hashing:
+        url_del = hmac_hashing(url_del, ssl_on=ssl_on)
+    c = Client(app, BaseResponse)
+    return c.delete(url_del, environ_overrides=environ)
 
 def test_public_key_nao_encontrado():
     """Tem de retornar 401 para todos os testes, pois não existe a public_key na url"""
@@ -122,7 +147,14 @@ def test_GET_valido():
     
     assert_code(get(funcionarios + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True), 200)
     assert_code(get(patroes + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True), 200)
-    assert_code(get(usuarios + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True), 200)    
+    assert_code(get(usuarios + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True), 200)
+
+def test_GET_valido_SSL():
+    """Tem de retornar 200 para todos os testes, pois a URL é completamente valida, usando SSL (HTTPS)"""
+    
+    assert_code(get(funcionarios + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True, ssl_on=True), 200)
+    assert_code(get(patroes + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True, ssl_on=True), 200)
+    assert_code(get(usuarios + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, hashing=True, ssl_on=True), 200)
 
 def test_GET_quantidade_correta_patroes():
     """Tem de retornar a quantidade de patroes definida em QTD_PATROES"""
@@ -207,5 +239,28 @@ def test_DELETE_patrao():
     """Tem de retornar o codigo 204, pois informará que o patrao foi excluído"""
 
     response = delete(patroes + '1/' + '?public_key=2&timestamp=' + TIMESTAMP_AGORA)    
-    assert_code(response, 204)      
+    assert_code(response, 204)
 
+def test_POST_criacao_usuario_SSL():
+    """Tem de retornar o codigo 201, informando que o usuario foi cadastrado, usando SSL (HTTPS)"""
+
+    response = post(usuarios + '?public_key=' + settings.SECRET_ID + '&timestamp=' + TIMESTAMP_AGORA, {"password":"123", "username":"matheuscassl"}, ssl_on=True)  
+    assert_code(response, 201)
+
+def test_PUT_edicao_usuario_SSL():
+    """Tem de retornar o codigo 204, pois informará que o usuário foi atualizado, usando SSL (HTTPS)"""
+
+    response = put(usuarios + '2/' + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, {"first_name":"First Name SSL"}, ssl_on=True)
+    assert_code(response, 204)
+
+def test_PATCH_edicao_usuario_SSL():
+    """Tem de retornar o codigo 202, pois informará que a atualização do usuário foi aceita (PATCH), usando SSL (HTTPS)"""
+
+    response = patch(usuarios + '2/' + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, {"first_name":"Patched Name SSL"}, ssl_on=True)
+    assert_code(response, 202)
+
+def test_DELETE_usuario_SSL():
+    """Tem de retornar o codigo 204, pois informará que o usuário foi excluído, usando SSL (HTTPS)"""
+
+    response = delete(usuarios + '2/' + '?public_key=1&timestamp=' + TIMESTAMP_AGORA, ssl_on=True)
+    assert_code(response, 204)
