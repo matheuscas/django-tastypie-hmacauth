@@ -17,8 +17,8 @@ class Patrao(models.Model):
         ordering = ('data_de_cadastro',)  
     usuario = models.ForeignKey(User)
 
-    data_de_cadastro = models.DateTimeField(default=datetime.now, blank=True, null=True, verbose_name="data de cadastro no Sistema", auto_now_add=True)
-    data_de_atualizacao = models.DateTimeField(default=datetime.now, blank=True, null=True, verbose_name="data de atualizacao no Sistema", auto_now=True)
+    data_de_cadastro = models.DateTimeField(blank=True, null=True, verbose_name="data de cadastro no Sistema", auto_now_add=True)
+    data_de_atualizacao = models.DateTimeField(blank=True, null=True, verbose_name="data de atualizacao no Sistema", auto_now=True)
     def __unicode__(self):
         return u'%s' % (self.usuario.username)
 
@@ -41,16 +41,16 @@ class Funcionario(models.Model):
         )
     rg = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)  
     cpf = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2)  
-    data_de_nascimento = models.DateTimeField(default=datetime.now, blank=True, null=True, verbose_name="data de cadastro no Sistema", auto_now_add=True)
+    data_de_nascimento = models.DateTimeField(blank=True, null=True, verbose_name="data de cadastro no Sistema", auto_now_add=True)
     telefone_residencial = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2) 
     telefone_celular = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2) 
     telefone_residencial = models.DecimalField(blank=True, null=True, max_digits=5, decimal_places=2) 
     email = models.EmailField(max_length=70,blank=True)
     cargo = models.CharField(max_length=100,blank=True)
-    data_de_admissao = models.DateTimeField(default=datetime.now, blank=True, null=True, verbose_name="data de admissao do funcionario", auto_now_add=True)
+    data_de_admissao = models.DateTimeField(blank=True, null=True, verbose_name="data de admissao do funcionario", auto_now_add=True)
   
-    data_de_cadastro = models.DateTimeField(default=datetime.now, blank=True, null=True, verbose_name="data de cadastro no Sistema", auto_now_add=True)
-    data_de_atualizacao = models.DateTimeField(default=datetime.now, blank=True, null=True, verbose_name="data de atualizacao no Sistema", auto_now=True)
+    data_de_cadastro = models.DateTimeField(blank=True, null=True, verbose_name="data de cadastro no Sistema", auto_now_add=True)
+    data_de_atualizacao = models.DateTimeField(blank=True, null=True, verbose_name="data de atualizacao no Sistema", auto_now=True)
     def __unicode__(self):
         return u'%s' % (self.nome)
 
