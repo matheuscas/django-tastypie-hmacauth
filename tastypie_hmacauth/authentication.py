@@ -54,7 +54,7 @@ class HMACAuthentication(Authentication):
     def is_api_key_valid(self, api_key, request):
 
         protocol = 'http://'
-        if 'https' in request.scheme:
+        if [x for x in request.scheme, request.META['HTTP_X_FORWARDED_PROTO'] if 'https' in x]:
             protocol = 'https://'
 
         host = request.META['HTTP_HOST'] if 'HTTP_HOST' in request.META else 'localhost'  # ResourceTestCase api_client does not set HTTP_HOST
