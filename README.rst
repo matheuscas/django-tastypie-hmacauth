@@ -11,7 +11,7 @@ Dependencies
 
 This project relies on two main dependencies:
 
-- Django 1.6 or higher
+- Django 1.8 or higher
 - Tastypie 0.12.2 or higher
 
 This project **will not install Django for you** despite of to be a dependency. But, it will install Tastypie, at least. 
