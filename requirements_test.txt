@@ -1,5 +1,5 @@
 colorama==0.3.3
-Django==1.8
+Django==2.2.24
 django-autofixture==0.10.1
 django-nose==1.4.1
 django-tastypie==0.12.2
